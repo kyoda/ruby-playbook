@@ -1,0 +1,35 @@
+- name: install rpm packages
+  yum: name="{{ item }}" state=present
+  with_items:
+    - "@Development Tools"
+    - readline-devel
+    - tar
+    - bzip2
+    - git
+    - openssl-devel
+
+- name: git clone rbenv
+  git: repo=https://github.com/sstephenson/rbenv.git
+       dest=/root/.rbenv
+       version=master
+       accept_hostkey=yes
+
+- name: set rbenv path
+  lineinfile: dest=/root/.bash_profile line='export PATH="$HOME/.rbenv/bin:$PATH"'
+
+- name: set rbenv path
+  lineinfile: dest=/root/.bash_profile line="eval \"$(rbenv init -)\""
+
+- name: git clone ruby-build
+  git: repo=https://github.com/sstephenson/ruby-build.git
+       dest=/root/.rbenv/plugins/ruby-build
+       version=master
+       accept_hostkey=yes
+
+- name: ruby install
+  shell: /root/.rbenv/bin/rbenv install -v {{ ruby_version }}
+- name: ruby rehash
+  shell: /root/.rbenv/bin/rbenv rehash
+- name: ruby global
+  shell: /root/.rbenv/bin/rbenv global {{ ruby_version }}
+
